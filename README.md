@@ -1,4 +1,4 @@
-# Simple postgres wrapper for Npgsql
+# Simple Powershell wrapper for Npgsql
 
 ```powershell
 Install-Module cbsch-pgsql -Scope CurrentUser
