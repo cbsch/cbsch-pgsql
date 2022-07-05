@@ -5,7 +5,8 @@ Function Invoke-PgSql {
         [Parameter()][int]$Port = 5432,
         [Parameter()][string]$Database = "postgres",
         [Parameter()][string]$Query,
-        [Parameter()][Switch]$AsHashTable
+        [Parameter()][Switch]$AsHashTable,
+        [Parameter()][HashTable]$Parameters
     )
 
     $factory = [Npgsql.NpgsqlFactory]::Instance
@@ -24,6 +25,16 @@ Function Invoke-PgSql {
         $command = $factory.CreateCommand()
         $command.CommandText = $Query
         $command.Connection = $connection
+
+        if ($Parameters) {
+            foreach ($parameter in $Parameters.GetEnumerator()) {
+                $command.Parameters.Add(
+                    $parameter.Key,
+                    (Convert-NetTypeToNpgsqlType $parameter.Value.PSObject.TypeNames[0])
+                ) | Out-Null
+                $command.Parameters[$parameter.Key].Value = $parameter.Value
+            }
+        }
 
         $adapter = $factory.CreateDataAdapter()
         $adapter.SelectCommand = $command
