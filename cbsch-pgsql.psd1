@@ -1,4 +1,5 @@
 @{
+PowerShellHostVersion = '7.0.0'
 RootModule = 'tools/loader.psm1'
 ModuleVersion = '1.0.2'
 GUID = '1dcadff2-5493-44a8-af48-e95dae9c0fa2'
