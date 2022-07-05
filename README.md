@@ -3,8 +3,9 @@
 ```powershell
 Install-Module cbsch-pgsql -Scope CurrentUser
 $credential = Get-Credential
+$connection = Connect-PgSql -Credential $credential
 
-Invoke-PgSql -Credential $credential -Query @"
+Invoke-PgSql -Connection $connection -Query @"
 CREATE TABLE test(
     id int,
     guid uuid,
@@ -15,7 +16,7 @@ CREATE TABLE test(
 )
 "@
 
-Invoke-PgSql -Credential $credential -Query @"
+Invoke-PgSql -Connection $connection -Query @"
 INSERT INTO test(id, guid, date, smallint, bigint, double)
 VALUES(@id, @guid, @date, @smallint, @bigint, @double)
 "@ -Parameters @{
@@ -27,5 +28,5 @@ VALUES(@id, @guid, @date, @smallint, @bigint, @double)
     "@double" = 0.23
 }
 
-Invoke-PgSql -Credential $credential -Query "SELECT * FROM test"
+Invoke-PgSql -Connection $connection -Query "SELECT * FROM test"
 ```

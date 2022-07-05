@@ -1,27 +1,37 @@
 Function Invoke-PgSql {
     Param(
-        [Parameter(Mandatory)][PSCredential]$Credential,
-        [Parameter()][string]$Server = "localhost",
-        [Parameter()][int]$Port = 5432,
-        [Parameter()][string]$Database = "postgres",
+        [Parameter(ParameterSetName="Connection")][Npgsql.NpgsqlConnection]$Connection,
+        [Parameter(ParameterSetName="Default", Mandatory)][PSCredential]$Credential,
+        [Parameter(ParameterSetName="Default")][string]$Server = "localhost",
+        [Parameter(ParameterSetName="Default")][int]$Port = 5432,
+        [Parameter(ParameterSetName="Default")][string]$Database = "postgres",
         [Parameter()][string]$Query,
         [Parameter()][Switch]$AsHashTable,
         [Parameter()][HashTable]$Parameters
     )
 
     $factory = [Npgsql.NpgsqlFactory]::Instance
-    $b = $factory.CreateConnectionStringBuilder()
-    $b.UserName = $Credential.UserName
-    $b.Password = $Credential.GetNetworkCredential().Password
-    $b.Database = $Database
-    $b.Port = $Port
-    $b.Host = $Server
 
-    $connection = $factory.CreateConnection()
-    $connection.ConnectionString = $b.ToString()
+    if (!$connection) {
+        $b = $factory.CreateConnectionStringBuilder()
+        $b.UserName = $Credential.UserName
+        $b.Password = $Credential.GetNetworkCredential().Password
+        $b.Database = $Database
+        $b.Port = $Port
+        $b.Host = $Server
+
+        $connection = $factory.CreateConnection()
+        $connection.ConnectionString = $b.ToString()
+        $connectionOwned = $true
+    } else {
+        $connectionOwned = $false
+    }
 
     try {
-        $connection.Open()
+        if ($connection.State -ne "Open") {
+            $connection.Open()
+        }
+
         $command = $factory.CreateCommand()
         $command.CommandText = $Query
         $command.Connection = $connection
@@ -65,6 +75,6 @@ Function Invoke-PgSql {
         }
     } finally {
         if ($reader) { $reader.Close() }
-        if ($connection) { $connection.Close() }
+        if ($connection -and $connectionOwned) { $connection.Close() }
     }
 }

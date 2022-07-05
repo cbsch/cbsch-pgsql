@@ -12,6 +12,8 @@ RequiredAssemblies = 'bin\Npgsql.dll'
 
 # StartGenerated
 FunctionsToExport = @(
+    "Connect-PgSql",
+    "Convert-NetTypeToNpgsqlType",
     "Invoke-PgSql"
 )
 
