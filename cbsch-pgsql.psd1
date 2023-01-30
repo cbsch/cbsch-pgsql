@@ -22,6 +22,7 @@ FunctionsToExport = @(
 PrivateData = @{
     PSData = @{
         ProjectUri = 'https://github.com/cbsch/cbsch-pgsql'
+        LicenseUri = 'https://github.com/cbsch/cbsch-pgsql/blob/main/LICENSE.md'
     }
 }
 }
